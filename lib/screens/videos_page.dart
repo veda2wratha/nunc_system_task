@@ -13,13 +13,6 @@ class VideosPage extends StatefulWidget {
 }
 
 class _VideosPagePageState extends State<VideosPage> {
-  late Future<List<VideosModel>> videos;
-
-  @override
-  void initState() {
-    super.initState();
-    videos = VideosProvider.getVideos();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +20,11 @@ class _VideosPagePageState extends State<VideosPage> {
       appBar: AppBar(
         elevation: 4,
         shadowColor: Theme.of(context).shadowColor,
-        leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Icon(Icons.arrow_back)),
+        // leading: InkWell(
+        //     onTap: () {
+        //       Navigator.pop(context);
+        //     },
+        //     child: const Icon(Icons.arrow_back)),
         title: const Text(
           'Videos',
           style: kHead3TextStyle,
@@ -39,29 +32,33 @@ class _VideosPagePageState extends State<VideosPage> {
         automaticallyImplyLeading: false,
       ),
       body: FutureBuilder<List<VideosModel>>(
-          future: videos,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-                if (snapshot.data != null) {
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(16.0),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return VideoItem(snapshot.data![index]);
-                    },
+        future: VideosProvider.getVideosFromDB(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data != null) {
+              return ListView.builder(
+                padding: const EdgeInsets.all(16.0),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return VideoItem(
+                    item: snapshot.data![index],
                   );
-                }
-                else{
-                  return const Center(
-                    child: Text('No Leaves Yet!', style: kHead3TextStyle,),
-                  );
-                }
-
-            } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
+                },
+              );
+            } else {
+              return const Center(
+                child: Text(
+                  'No Data',
+                  style: kHead3TextStyle,
+                ),
+              );
             }
-            return const Center(child: CircularProgressIndicator());
-          }),
+          } else if (snapshot.hasError) {
+            return Text('${snapshot.error}');
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
 }

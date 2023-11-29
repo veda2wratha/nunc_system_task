@@ -5,6 +5,8 @@
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
+import 'package:nunc_system_task/database/videos_table.dart';
+
 List<VideosModel> videosModelFromJson(String str) => List<VideosModel>.from(
     json.decode(str).map((x) => VideosModel.fromJson(x)));
 
@@ -18,7 +20,7 @@ class VideosModel {
   final String videourl;
   final String rendering;
   final String thumbnail;
-  final DateTime lastupdate;
+  final String lastupdate;
   final String videoLocalTitle;
   final String videoTitle;
 
@@ -41,7 +43,7 @@ class VideosModel {
         videourl: json["videourl"],
         rendering: json["rendering"],
         thumbnail: json["thumbnail"],
-        lastupdate: DateTime.parse(json["lastupdate"]),
+        lastupdate: json["lastupdate"],
         videoLocalTitle: json["video_local_title"],
         videoTitle: json["video_title"],
       );
@@ -53,7 +55,7 @@ class VideosModel {
         "videourl": videourl,
         "rendering": rendering,
         "thumbnail": thumbnail,
-        "lastupdate": lastupdate.toIso8601String(),
+        "lastupdate": lastupdate,
         "video_local_title": videoLocalTitle,
         "video_title": videoTitle,
       };

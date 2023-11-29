@@ -3,45 +3,53 @@ import 'package:flutter/material.dart';
 import 'package:nunc_system_task/models/videos_model.dart';
 
 class VideoItem extends StatelessWidget {
-  const VideoItem(this.item, {super.key});
+  const VideoItem({super.key, required this.item});
   final VideosModel item;
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-      child: Row(
-        children: [
-          InkWell(
-            child: CachedNetworkImage(
-              width: 75,
-              height: 75,
-              imageUrl: item.thumbnail,
-              //placeholder: (context, url) => const CircularProgressIndicator(),
-              errorWidget: (context, url, error) => const Icon(
-                Icons.video_call_sharp,
-                color: Colors.red,
-              ),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, '/video_player_page', arguments: item);
+        },
+        child: Column(
+          children: [
+            Row(
+              children: [
+                CachedNetworkImage(
+                  width: 75,
+                  height: 75,
+                  imageUrl: item.thumbnail,
+                  //placeholder: (context, url) => const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.video_call_sharp,
+                    color: Colors.red,
+                  ),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.videoTitle),
+                    Text(item.videoLocalTitle),
+                    Text(item.rendering),
+                    const Text('Flick Fusion'),
+                  ],
+                ),
+                const Spacer(),
+                const Icon(Icons.share),
+              ],
             ),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(item.videoTitle),
-              Text(item.videoLocalTitle),
-              Text(item.rendering),
-              const Text('Flick Fusion'),
-            ],
-          ),
-          const Spacer(),
-          // const SizedBox(
-          //   width: 20,
-          // ),
-          const Icon(Icons.share),
-        ],
+            const Divider(
+              height: 20,
+              color: Colors.black12,
+            ),
+          ],
+        ),
       ),
     );
   }
