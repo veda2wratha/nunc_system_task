@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:nunc_system_task/models/videos_model.dart';
 
+import '../database/database.dart';
+
 class VideoItem extends StatelessWidget {
   const VideoItem({super.key, required this.item});
-  final VideosModel item;
+  final VideosTableData item;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -20,7 +22,7 @@ class VideoItem extends StatelessWidget {
                 CachedNetworkImage(
                   width: 75,
                   height: 75,
-                  imageUrl: item.thumbnail,
+                  imageUrl: item.thumbnail!,
                   //placeholder: (context, url) => const CircularProgressIndicator(),
                   errorWidget: (context, url, error) => const Icon(
                     Icons.video_call_sharp,
@@ -34,9 +36,9 @@ class VideoItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.videoTitle),
-                    Text(item.videoLocalTitle),
-                    Text(item.rendering),
+                    Text(item.video_title!),
+                    Text(item.video_local_title!),
+                    Text(item.rendering!),
                     const Text('Flick Fusion'),
                   ],
                 ),

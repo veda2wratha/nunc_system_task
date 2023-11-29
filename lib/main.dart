@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:nunc_system_task/database/database.dart';
 import 'package:nunc_system_task/provider/videos_provider.dart';
 import 'package:nunc_system_task/screens/video_player_page.dart';
 import 'package:nunc_system_task/screens/videos_page.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -15,6 +17,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<AppDatabase>(
+          create: (context) => AppDatabase(),
+          dispose: (context, db) => db.close(),
+        ),
         ChangeNotifierProvider(create: (_) => VideosProvider()),
       ],
       child: MaterialApp(
