@@ -31,7 +31,7 @@ class _VideoItemState extends State<VideoItem> {
     Icons.play_circle
   ];
   StreamController<TaskProgressUpdate> progressUpdateStream =
-      StreamController();
+      StreamController.broadcast();
 
   @override
   void initState() {
@@ -103,7 +103,8 @@ class _VideoItemState extends State<VideoItem> {
                       // onPressed: VideoDownloaderProvider()
                       //     .processButtonPress(),
                       onPressed: () async {
-                        processButtonPress(widget.item);
+                        //processButtonPress(widget.item);
+
                         // Next, enqueue tasks to kick off background downloads, e.g.
                         // final task = DownloadTask(
                         //     url: widget.item.videourl ?? '',
@@ -113,11 +114,12 @@ class _VideoItemState extends State<VideoItem> {
                         // final successfullyEnqueued =
                         //     await FileDownloader().enqueue(task);
                         // Listen to updates and process
-
                       },
 
                       icon: Icon(
-                        buttonIcons[buttonState.index],
+                        widget.item.video_progress > 99
+                            ? buttonIcons.last
+                            : buttonIcons.first,
                         size: 50,
                       ),
                     ),
@@ -135,6 +137,7 @@ class _VideoItemState extends State<VideoItem> {
                   Text(widget.item.video_local_title ?? ''),
                   Text(widget.item.rendering ?? ''),
                   const Text('Flick Fusion'),
+                  Text('${widget.item.video_progress} %' ?? ''),
                 ],
               ),
               const Spacer(),
@@ -260,9 +263,7 @@ class _VideoItemState extends State<VideoItem> {
         case TaskStatusUpdate _:
           if (update.task == backgroundDownloadTask) {
             buttonState = switch (update.status) {
-              TaskStatus.running ||
-              TaskStatus.enqueued =>
-              ButtonState.pause,
+              TaskStatus.running || TaskStatus.enqueued => ButtonState.pause,
               TaskStatus.paused => ButtonState.resume,
               TaskStatus.complete => ButtonState.play,
               _ => ButtonState.reset
@@ -274,28 +275,27 @@ class _VideoItemState extends State<VideoItem> {
 
         case TaskProgressUpdate _:
           progressUpdateStream.add(update);
-
-          progressUpdateStream.stream.listen((value) {
-            debugPrint('Progresss ...$value');
-            //updateValue(value);
-            // VideosTableCompanion newVideo =
-            //     VideosTableCompanion.insert(
-            //   video_id: Value(item.videoId),
-            //   video_fk: Value(item.videoFk),
-            //   views: Value(widget.item.views),
-            //   videourl: Value(widget.item.videourl),
-            //   rendering: Value(widget.item.rendering),
-            //   thumbnail: Value(widget.item.thumbnail),
-            //   lastupdate: Value(widget.item.lastupdate),
-            //   video_local_title:
-            //       Value(widget.item.videoLocalTitle),
-            //   video_title: Value(widget.item.videoTitle),
-            //   video_progress: Value(event.progress),
-            // );
-            // context
-            //     .read<AppDatabase>()
-            //     .updateData(newVideo);
-          }); // pass on to widget for indicator
+        // progressUpdateStream.stream.listen((value) {
+        //   debugPrint('Progresss ...$value');
+        //   //updateValue(value);
+        //   // VideosTableCompanion newVideo =
+        //   //     VideosTableCompanion.insert(
+        //   //   video_id: Value(item.videoId),
+        //   //   video_fk: Value(item.videoFk),
+        //   //   views: Value(widget.item.views),
+        //   //   videourl: Value(widget.item.videourl),
+        //   //   rendering: Value(widget.item.rendering),
+        //   //   thumbnail: Value(widget.item.thumbnail),
+        //   //   lastupdate: Value(widget.item.lastupdate),
+        //   //   video_local_title:
+        //   //       Value(widget.item.videoLocalTitle),
+        //   //   video_title: Value(widget.item.videoTitle),
+        //   //   video_progress: Value(event.progress),
+        //   // );
+        //   // context
+        //   //     .read<AppDatabase>()
+        //   //     .updateData(newVideo);
+        // }); // pass on to widget for indicator
       }
     });
 

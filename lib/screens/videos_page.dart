@@ -9,6 +9,7 @@ import 'package:nunc_system_task/provider/videos_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:background_downloader/background_downloader.dart';
 import '../constants.dart';
+import '../provider/donloader.dart';
 
 class VideosPage extends StatefulWidget {
   const VideosPage({super.key});
@@ -71,8 +72,19 @@ class _VideosPagePageState extends State<VideosPage> {
                 padding: const EdgeInsets.all(16.0),
                 itemCount: snapshot.data!.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return VideoItem(
-                    item: snapshot.data![index],
+                  return GestureDetector(
+                    onTap: () {
+                      String vv = snapshot.data![index].rendering!;
+                      if (vv != 'Completed') {
+                        VideoDownloadedSave().downloadVideoToLocal(
+                            snapshot.data![index], context);
+                      }else{
+
+                      }
+                    },
+                    child: VideoItem(
+                      item: snapshot.data![index],
+                    ),
                   );
                 },
               );
