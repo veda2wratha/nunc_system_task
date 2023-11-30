@@ -7,7 +7,7 @@ import 'package:nunc_system_task/database/database.dart';
 import 'package:nunc_system_task/provider/videos_provider.dart';
 import 'package:provider/provider.dart';
 import '../constants.dart';
-import '../provider/donloader.dart';
+import '../provider/video_donloader.dart';
 
 class VideosPage extends StatefulWidget {
   const VideosPage({super.key});
@@ -47,7 +47,7 @@ class _VideosPagePageState extends State<VideosPage> {
                     onTap: () {
                       String status = snapshot.data![index].rendering!;
                       if (status != 'Completed') {
-                        VideoDownloadedSave().downloadVideoToLocal(
+                        VideoDownloader().downloadVideoToLocal(
                             snapshot.data![index], context);
                       }
                     },
@@ -76,34 +76,6 @@ class _VideosPagePageState extends State<VideosPage> {
   }
 
   Future<void> initializeProvider() async {
-    /// Process the user tapping on a notification by printing a message
-    void myNotificationTapCallback(
-        Task task, NotificationType notificationType) {
-      debugPrint(
-          'Tapped notification $notificationType for taskId ${task.taskId}');
-    }
-    FileDownloader()
-        .registerCallbacks(
-            taskNotificationTapCallback: myNotificationTapCallback)
-        .configureNotificationForGroup(FileDownloader.defaultGroup,
-            // For the main download button
-            // which uses 'enqueue' and a default group
-            running: const TaskNotification('Download {filename}',
-                'File: {filename} - {progress} - speed {networkSpeed} and {timeRemaining} remaining'),
-            complete: const TaskNotification(
-                '{displayName} download {filename}', 'Download complete'),
-            error: const TaskNotification(
-                'Download {filename}', 'Download failed'),
-            paused: const TaskNotification(
-                'Download {filename}', 'Paused with metadata {metadata}'),
-            progressBar: true)
-        .configureNotification(
-            // for the 'Download & Open' dog picture
-            // which uses 'download' which is not the .defaultGroup
-            // but the .await group so won't use the above config
-            complete: const TaskNotification(
-                'Download {filename}', 'Download complete'),
-            tapOpensFile: true);
     VideosProvider();
     bool result = await InternetConnectionChecker().hasConnection;
     if (result == true) {
