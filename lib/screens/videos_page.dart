@@ -49,6 +49,9 @@ class _VideosPagePageState extends State<VideosPage> {
                       if (status != 'Completed') {
                         VideoDownloader().downloadVideoToLocal(
                             snapshot.data![index], context);
+                      }else{
+                        //Play the video
+                        VideoDownloader().playVideo(snapshot.data![index]);
                       }
                     },
                     child: VideoView(
@@ -80,7 +83,6 @@ class _VideosPagePageState extends State<VideosPage> {
     bool result = await InternetConnectionChecker().hasConnection;
     if (result == true) {
       debugPrint('internet available');
-
       insertDataToDP();
     } else {
       debugPrint('No internet :( Reason:');
