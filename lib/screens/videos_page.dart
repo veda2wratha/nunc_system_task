@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nunc_system_task/componets/video_item.dart';
 import 'package:nunc_system_task/database/database.dart';
+import 'package:nunc_system_task/provider/video_downloader.dart';
 import 'package:nunc_system_task/provider/videos_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:background_downloader/background_downloader.dart';
@@ -15,9 +18,13 @@ class VideosPage extends StatefulWidget {
 
 class _VideosPagePageState extends State<VideosPage> {
   @override
-  Widget build(BuildContext context) {
-    initilyzeProvider();
+  void initState() {
+    super.initState();
+    initializeProvider();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 4,
@@ -87,19 +94,42 @@ class _VideosPagePageState extends State<VideosPage> {
     );
   }
 
-  Future<void> initilyzeProvider() async {
+  Future<void> initializeProvider() async {
     VideosProvider();
-    context.read<AppDatabase>().allVideosItems.then(
-          (value) => {
-            debugPrint('value $value'),
-            if (value.isEmpty)
-              {
-                debugPrint('13'),
-                context.read<AppDatabase>().insertMultipleEntries(context.read<VideosProvider>().items)
-              }
-            else
-              {debugPrint('12')}
-          },
-        );
+    bool result = await InternetConnectionChecker().hasConnection;
+    if (result == true) {
+      debugPrint('internet available');
+
+      insertDataToDP();
+    } else {
+      debugPrint('No internet :( Reason:');
+      showAlert();
+    }
+  }
+
+  void insertDataToDP() {
+    List<VideosTableCompanion> items = context.read<VideosProvider>().items;
+    context.read<AppDatabase>().allVideosItems.then((value) => {
+          if (value.isNotEmpty)
+            {
+              debugPrint('Table is not created'),
+              context.read<AppDatabase>().insertMultipleEntries(items),
+            }
+          else
+            {
+              debugPrint('Table is already created with data'),
+              context.read<AppDatabase>().insertMultipleEntries(items),
+            }
+        });
+  }
+
+  void showAlert() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("No internet"),
+      ),
+    );
   }
 }
+
+enum ButtonState { download, cancel, pause, resume, reset }

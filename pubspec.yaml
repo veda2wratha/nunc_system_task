@@ -44,6 +44,7 @@ dependencies:
   path_provider: ^2.0.0
   path: ^1.8.3
   background_downloader: ^7.12.3
+  internet_connection_checker: ^1.0.0+1
 
 dev_dependencies:
   drift_dev: ^2.13.0
