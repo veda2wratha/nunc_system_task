@@ -1,13 +1,11 @@
 import 'dart:async';
+import 'package:background_downloader/background_downloader.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nunc_system_task/componets/video_item.dart';
+import 'package:nunc_system_task/componets/video_view.dart';
 import 'package:nunc_system_task/database/database.dart';
-import 'package:nunc_system_task/provider/video_downloader.dart';
 import 'package:nunc_system_task/provider/videos_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:background_downloader/background_downloader.dart';
 import '../constants.dart';
 import '../provider/donloader.dart';
 
@@ -30,39 +28,12 @@ class _VideosPagePageState extends State<VideosPage> {
       appBar: AppBar(
         elevation: 4,
         shadowColor: Theme.of(context).shadowColor,
-        // leading: InkWell
-        //     onTap: () {
-        //       Navigator.pop(context);
-        //     },
-        //     child: const Icon(Icons.arrow_back)),
         title: const Text(
           'Videos',
           style: kHead3TextStyle,
         ),
         automaticallyImplyLeading: false,
       ),
-
-      // body: ListView.builder(
-      //           padding: const EdgeInsets.all(16.0),
-      //           itemCount: context.watch<VideosProvider>().videosFromDatabase.length,
-      //           itemBuilder: (BuildContext context, int index) {
-      //             return VideoItem(
-      //               item: context.watch<VideosProvider>().videosFromDatabase[index],
-      //             );
-      //           },
-      //         )
-      // body: Consumer<VideosProvider>(
-      //   builder: (context, cart, child) => Stack(
-      //     children: [
-      //       // Use SomeExpensiveWidget here, without rebuilding every time.
-      //       if (child != null) child,
-      //       Text('Total price: ${cart.videosFromDatabase.length}'),
-      //     ],
-      //   ),
-      //   // Build the expensive widget here.
-      //   child: const Text('data'),
-      // ),
-
       body: StreamBuilder<List<VideosTableData>>(
         stream: context.watch<AppDatabase>().watchEntriesInCategory(),
         builder: (context, snapshot) {
@@ -74,15 +45,13 @@ class _VideosPagePageState extends State<VideosPage> {
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     onTap: () {
-                      String vv = snapshot.data![index].rendering!;
-                      if (vv != 'Completed') {
+                      String status = snapshot.data![index].rendering!;
+                      if (status != 'Completed') {
                         VideoDownloadedSave().downloadVideoToLocal(
                             snapshot.data![index], context);
-                      }else{
-
                       }
                     },
-                    child: VideoItem(
+                    child: VideoView(
                       item: snapshot.data![index],
                     ),
                   );
@@ -107,6 +76,34 @@ class _VideosPagePageState extends State<VideosPage> {
   }
 
   Future<void> initializeProvider() async {
+    /// Process the user tapping on a notification by printing a message
+    void myNotificationTapCallback(
+        Task task, NotificationType notificationType) {
+      debugPrint(
+          'Tapped notification $notificationType for taskId ${task.taskId}');
+    }
+    FileDownloader()
+        .registerCallbacks(
+            taskNotificationTapCallback: myNotificationTapCallback)
+        .configureNotificationForGroup(FileDownloader.defaultGroup,
+            // For the main download button
+            // which uses 'enqueue' and a default group
+            running: const TaskNotification('Download {filename}',
+                'File: {filename} - {progress} - speed {networkSpeed} and {timeRemaining} remaining'),
+            complete: const TaskNotification(
+                '{displayName} download {filename}', 'Download complete'),
+            error: const TaskNotification(
+                'Download {filename}', 'Download failed'),
+            paused: const TaskNotification(
+                'Download {filename}', 'Paused with metadata {metadata}'),
+            progressBar: true)
+        .configureNotification(
+            // for the 'Download & Open' dog picture
+            // which uses 'download' which is not the .defaultGroup
+            // but the .await group so won't use the above config
+            complete: const TaskNotification(
+                'Download {filename}', 'Download complete'),
+            tapOpensFile: true);
     VideosProvider();
     bool result = await InternetConnectionChecker().hasConnection;
     if (result == true) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:nunc_system_task/database/database.dart';
-import 'package:nunc_system_task/provider/video_downloader.dart';
 import 'package:nunc_system_task/provider/videos_provider.dart';
 import 'package:nunc_system_task/screens/video_player_page.dart';
 import 'package:nunc_system_task/screens/videos_page.dart';
@@ -23,7 +22,6 @@ class MyApp extends StatelessWidget {
           dispose: (context, db) => db.close(),
         ),
         ChangeNotifierProvider(create: (_) => VideosProvider()),
-        ChangeNotifierProvider(create: (_) => VideoDownloaderProvider()),
       ],
       child: MaterialApp(
         routes: {

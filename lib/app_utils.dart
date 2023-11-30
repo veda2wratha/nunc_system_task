@@ -1,5 +1,5 @@
 class AppUrl {
-  static const String liveBaseURL = "varthmaan.com";
+  static const String liveBaseURL = "";
   static const String localBaseURL = "";
   static const String baseURL = liveBaseURL;
   
